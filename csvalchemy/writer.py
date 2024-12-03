@@ -4,6 +4,7 @@ import typing
 import csv
 
 from . import result as _result
+from . import to_dict as _to_dict
 
 
 @dataclass
@@ -25,7 +26,10 @@ class ResultsCSVWriterIterator(abc.Iterator):
     ) -> _result.Result:
         if result.error:
             return result
-        row: dict[str, typing.Any] = result.result.model_dump()
+        if result.result:
+            row: dict[str, typing.Any] = _to_dict.data_to_dict(result.result)
+        else:
+            return result
         if self.headers == False:
             self.writer = csv.DictWriter(self.csv_file, fieldnames=row)
             try:
